@@ -6,6 +6,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = "2.33.3"
+getrandom = { version = "0.2.3", features = ["js"] }
 ndarray = "0.15.3"
 rand = "0.8.4"
+yew = "0.18.0"
