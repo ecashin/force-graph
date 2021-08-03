@@ -78,8 +78,7 @@ fn dist(x1: &ArrayView1<f32>, x2: &ArrayView1<f32>) -> f32 {
     (&diff * &diff).sum().sqrt()
 }
 
-pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge]) {
-    const N_ITERS: usize = 100;
+pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge], n_iters: usize) {
     let ideal_dist: f32 = 1.0 / pos.nrows() as f32;
     let mut edges_by_node: HashMap<usize, Vec<usize>> = HashMap::new();
     const CTR_WEIGHT: f32 = 0.1;
@@ -93,7 +92,7 @@ pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge]) {
         v.push(*src);
     }
 
-    for iter_no in 0..N_ITERS {
+    for iter_no in 0..n_iters {
         let mut new_positions = pos.to_owned();
         for (i, row) in pos.outer_iter().enumerate() {
             println!("{} row:{} orig_row:{:?}", iter_no, i, row);

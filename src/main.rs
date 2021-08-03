@@ -1,26 +1,25 @@
-use yew::{html, Component, ComponentLink, Html, ShouldRender};
+use yew::{html, Component, ComponentLink, Html, InputData, ShouldRender};
 
 mod glayout;
-
-struct GraphConfig {
-    n_vertices: usize,
-    n_dimensions: usize,
-    max_degree: usize,
-}
-
-struct LayoutConfig {
-    n_iters: usize,
-}
+mod js;
 
 enum Msg {
-    NewGraph(GraphConfig),
-    Layout(LayoutConfig),
+    SetNVertices(InputData),
+    SetNDimensions(InputData),
+    SetMaxDegree(InputData),
+    SetNIters(InputData),
+    NewGraph,
+    Layout,
 }
 
 struct Model {
+    debug: String,
     link: ComponentLink<Self>,
-    vertices: Vec<Vec<f32>>,
-    edges: Vec<usize>,
+    n_vertices: usize,
+    n_dimensions: usize,
+    max_degree: usize,
+    n_iters: usize,
+    graph: Option<js::Graph>,
 }
 
 impl Component for Model {
@@ -29,20 +28,61 @@ impl Component for Model {
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
         Self {
+            debug: "(unset)".to_owned(),
             link,
-            vertices: Vec::new(),
-            edges: Vec::new(),
+            n_vertices: 9,
+            n_dimensions: 3,
+            max_degree: 3,
+            n_iters: 1,
+            graph: None,
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::NewGraph(GraphConfig {
-                n_vertices,
-                n_dimensions,
-                max_degree,
-            }) => true,
-            Msg::Layout(LayoutConfig { n_iters }) => true,
+            Msg::SetNDimensions(input) => {
+                let n = input.value.parse::<usize>();
+                if let Ok(n) = n {
+                    self.n_dimensions = n;
+                }
+                true
+            }
+            Msg::SetNVertices(input) => {
+                let n = input.value.parse::<usize>();
+                if let Ok(n) = n {
+                    self.n_vertices = n;
+                }
+                true
+            }
+            Msg::SetMaxDegree(input) => {
+                let n = input.value.parse::<usize>();
+                if let Ok(n) = n {
+                    self.max_degree = n;
+                }
+                true
+            }
+            Msg::SetNIters(input) => {
+                let n = input.value.parse::<usize>();
+                if let Ok(n) = n {
+                    self.n_iters = n;
+                }
+                true
+            }
+            Msg::NewGraph => {
+                self.debug = format!(
+                    "{} {} {} {}",
+                    self.n_vertices, self.n_dimensions, self.max_degree, self.n_iters
+                )
+                .to_owned();
+                let pos = crate::glayout::initial_positions(self.n_vertices, self.n_dimensions);
+                let edges = crate::glayout::add_edges(self.n_vertices, self.max_degree);
+                self.graph = Some(js::make_graph(pos, edges).expect("making graph"));
+                true
+            }
+            Msg::Layout => {
+                // crate::glayout::force_graph(&mut pos, &edges, self.n_iters);
+                true
+            }
         }
     }
 
@@ -53,7 +93,50 @@ impl Component for Model {
     fn view(&self) -> Html {
         html! {
             <div>
-
+                <div class="flex">
+                    <div>
+                        <p>{ self.debug.clone() }</p>
+                    </div>
+                    <div>
+                        <label for="n_vertices">{ "Number of vertices" }</label>
+                        <input type="text"
+                            id="n_vertices"
+                            required=true
+                            oninput=self.link.callback(|e: InputData| Msg::SetNVertices(e))
+                        />
+                    </div>
+                    <div>
+                        <label for="n_dimensions">{ "Number of dimensions" }</label>
+                        <input type="text"
+                            id="n_dimension"
+                            required=true
+                            oninput=self.link.callback(|e: InputData| Msg::SetNDimensions(e))
+                        />
+                    </div>
+                    <div>
+                        <label for="max_degree">{ "Maximum degree" }</label>
+                        <input type="text"
+                            id="max_degree"
+                            required=true
+                            oninput=self.link.callback(|e: InputData| Msg::SetMaxDegree(e))
+                        />
+                    </div>
+                    <div>
+                        <label for="n_iters">{ "Number of Iterations" }</label>
+                        <input type="text"
+                            id="n_iters"
+                            required=true
+                            oninput=self.link.callback(|e: InputData| Msg::SetNIters(e))
+                        />
+                    </div>
+                    <div>
+                        <button id="new_graph"
+                            onclick=self.link.callback(|_| Msg::NewGraph)
+                            > { "New Graph" }</button>
+                    </div>
+                </div>
+                <div id="graph">
+                </div>
             </div>
         }
     }
