@@ -17,8 +17,8 @@ pub fn initial_positions(n: usize, n_dims: usize) -> Array2<f32> {
 
 #[derive(Debug)]
 pub struct Edge {
-    src: usize,
-    dst: usize,
+    pub src: usize,
+    pub dst: usize,
 }
 
 pub fn add_edges(n_vertices: usize, max_degree: usize) -> Vec<Edge> {
