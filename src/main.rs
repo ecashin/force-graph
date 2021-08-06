@@ -1,3 +1,4 @@
+use ndarray::{Array2, Axis};
 use yew::{html, Component, ComponentLink, Html, InputData, ShouldRender};
 
 mod glayout;
@@ -9,7 +10,7 @@ enum Msg {
     SetMaxDegree(InputData),
     SetNIters(InputData),
     NewGraph,
-    Layout,
+    LayoutIter,
 }
 
 struct Model {
@@ -20,6 +21,8 @@ struct Model {
     max_degree: usize,
     n_iters: usize,
     graph: Option<js::Graph>,
+    positions: Option<Array2<f32>>,
+    edges: Option<Vec<glayout::Edge>>,
 }
 
 impl Component for Model {
@@ -35,6 +38,8 @@ impl Component for Model {
             max_degree: 3,
             n_iters: 1,
             graph: None,
+            positions: None,
+            edges: None,
         }
     }
 
@@ -76,11 +81,35 @@ impl Component for Model {
                 .to_owned();
                 let pos = crate::glayout::initial_positions(self.n_vertices, self.n_dimensions);
                 let edges = crate::glayout::add_edges(self.n_vertices, self.max_degree);
-                self.graph = Some(js::make_graph(pos, edges).expect("making graph"));
+                self.graph = Some(js::make_graph(&pos, &edges).expect("making graph"));
+                self.positions = Some(pos);
+                self.edges = Some(edges);
                 true
             }
-            Msg::Layout => {
-                // crate::glayout::force_graph(&mut pos, &edges, self.n_iters);
+            Msg::LayoutIter => {
+                if self.positions.is_some() && self.edges.is_some() {
+                    macro_rules! row1 {
+                        ($arr:expr) => {
+                            $arr.as_ref().unwrap().index_axis(Axis(0), 0)
+                        };
+                    }
+                    let mut text = format!(
+                        "{:?}",
+                        // self.positions.as_ref().unwrap().index_axis(Axis(0), 0)
+                        row1!(self.positions)
+                    );
+                    crate::glayout::force_graph(
+                        self.positions.as_mut().unwrap(),
+                        self.edges.as_ref().unwrap(),
+                        self.n_iters,
+                    );
+                    text += format!("=>{:?}", row1!(self.positions)).as_str();
+                    self.debug = text;
+                    crate::js::graph_update_positions(
+                        self.graph.as_ref().unwrap(),
+                        self.positions.as_ref().unwrap(),
+                    )
+                }
                 true
             }
         }
@@ -93,7 +122,7 @@ impl Component for Model {
     fn view(&self) -> Html {
         html! {
             <div>
-                <div class="flex">
+                <div class="flex two four-800">
                     <div>
                         <p>{ self.debug.clone() }</p>
                     </div>
@@ -129,10 +158,17 @@ impl Component for Model {
                             oninput=self.link.callback(|e: InputData| Msg::SetNIters(e))
                         />
                     </div>
+                </div>
+                <div class="flex two">
                     <div>
                         <button id="new_graph"
                             onclick=self.link.callback(|_| Msg::NewGraph)
                             > { "New Graph" }</button>
+                    </div>
+                    <div>
+                        <button id="layout_iter"
+                            onclick=self.link.callback(|_| Msg::LayoutIter)
+                            > { "Iterate Layout" }</button>
                     </div>
                 </div>
                 <div id="graph">

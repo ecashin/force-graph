@@ -17,14 +17,14 @@ pub fn initial_positions(n: usize, n_dims: usize) -> Array2<f32> {
 
 #[derive(Debug)]
 pub struct Edge {
-    pub src: usize,
-    pub dst: usize,
+    pub src: u32,
+    pub dst: u32,
 }
 
 pub fn add_edges(n_vertices: usize, max_degree: usize) -> Vec<Edge> {
     let mut rng = thread_rng();
     let mut degrees = vec![0; n_vertices];
-    let mut edges: HashSet<(usize, usize)> = HashSet::new();
+    let mut edges: HashSet<(u32, u32)> = HashSet::new();
     for src in 0..n_vertices {
         let degree = rng.gen_range(1..max_degree);
         let mut n_attempts = 3;
@@ -37,9 +37,9 @@ pub fn add_edges(n_vertices: usize, max_degree: usize) -> Vec<Edge> {
                 if degrees[dst] >= max_degree {
                     continue;
                 }
-                edges.insert((dst, src));
+                edges.insert((dst as u32, src as u32));
             } else {
-                edges.insert((src, dst));
+                edges.insert((src as u32, dst as u32));
             }
             degrees[src] += 1;
             degrees[dst] += 1;
@@ -52,7 +52,7 @@ pub fn add_edges(n_vertices: usize, max_degree: usize) -> Vec<Edge> {
         .collect()
 }
 
-pub fn print_js(pos: Array2<f32>, edges: Vec<Edge>) {
+pub fn _print_js(pos: Array2<f32>, edges: Vec<Edge>) {
     println!("(function () {{");
     println!("    var g = G.graph()");
     println!("    var nodes = []");
@@ -80,7 +80,7 @@ fn dist(x1: &ArrayView1<f32>, x2: &ArrayView1<f32>) -> f32 {
 
 pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge], n_iters: usize) {
     let ideal_dist: f32 = 1.0 / pos.nrows() as f32;
-    let mut edges_by_node: HashMap<usize, Vec<usize>> = HashMap::new();
+    let mut edges_by_node: HashMap<u32, Vec<u32>> = HashMap::new();
     const CTR_WEIGHT: f32 = 0.1;
     let spread_weight: f32 = 0.0 / pos.len_of(Axis(0)) as f32;
     let repel_weight: f32 = 0.0 / pos.len_of(Axis(0)) as f32;
@@ -108,9 +108,9 @@ pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge], n_iters: usize) {
             println!("{} row:{} ctr:{:?}", iter_no, i, ctr);
             let mut spread: Array1<f32> = Array1::zeros(row.len());
             for (point, neighbors) in &edges_by_node {
-                let point = &pos.index_axis(Axis(0), *point);
+                let point = &pos.index_axis(Axis(0), *point as usize);
                 for i in neighbors {
-                    let neighbor = &pos.index_axis(Axis(0), *i);
+                    let neighbor = &pos.index_axis(Axis(0), *i as usize);
                     let obs_dist = dist(&point, &neighbor);
                     let direction = (neighbor - point) / obs_dist;
                     spread = spread + spread_weight * (obs_dist - ideal_dist) * direction;
