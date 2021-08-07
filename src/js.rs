@@ -45,7 +45,22 @@ extern "C" {
     pub fn nodes(this: &Graph) -> Array;
     #[wasm_bindgen(method)]
     pub fn node(this: &Graph, id: u32) -> Node;
+    #[wasm_bindgen(method, js_name=purgeNodes)]
+    pub fn purge_nodes(this: &Graph);
+    #[wasm_bindgen(method, js_name=addNodes)]
+    pub fn add_nodes(this: &Graph, nodes: Array);
+    #[wasm_bindgen(method, js_name=syncDataToFrames)]
+    pub fn sync_data(this: &Graph);
 }
+
+/*
+fn add_remove_nodes(graph: &Graph) {
+    let nodes = graph.nodes();
+    // let edges = graph.edges();
+    graph.purge_nodes();
+    graph.add_nodes(nodes);
+}
+*/
 
 pub fn graph_update_positions(graph: &Graph, pos: &Array2<f32>) {
     for i in 0..pos.len_of(Axis(0)) {
@@ -57,7 +72,9 @@ pub fn graph_update_positions(graph: &Graph, pos: &Array2<f32>) {
         console_log(JsValue::from(&node));
         node.set_pos(js_row);
     }
-    // adds it below: graph.render_in_element("graph");
+    // adds new canvas: graph.render_in_element("graph");
+    // add_remove_nodes(graph);
+    graph.sync_data();
 }
 
 pub fn make_graph(pos: &Array2<f32>, edges: &Vec<crate::glayout::Edge>) -> Result<Graph> {
@@ -91,11 +108,12 @@ pub fn make_graph(pos: &Array2<f32>, edges: &Vec<crate::glayout::Edge>) -> Resul
     console_log(JsValue::from("graph after adding edges:"));
     console_log(JsValue::from(&graph));
     graph.render_in_element("graph");
-    js_sys::Reflect::set(
+    let elc_debug = js_sys::Reflect::get(
         &web_sys::window().expect("getting window"),
         &JsValue::from("elcDebug"),
-        &JsValue::from(&graph),
     )
-    .expect("saving graph in JS global");
+    .expect("getting elcDebug global");
+    js_sys::Reflect::set(&elc_debug, &JsValue::from("graph"), &JsValue::from(&graph))
+        .expect("saving graph in JS global");
     Ok(graph)
 }

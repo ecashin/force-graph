@@ -79,11 +79,11 @@ fn dist(x1: &ArrayView1<f32>, x2: &ArrayView1<f32>) -> f32 {
 }
 
 pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge], n_iters: usize) {
-    let ideal_dist: f32 = 1.0 / pos.nrows() as f32;
+    let ideal_dist: f32 = 1.0;
     let mut edges_by_node: HashMap<u32, Vec<u32>> = HashMap::new();
-    const CTR_WEIGHT: f32 = 0.1;
-    let spread_weight: f32 = 0.0 / pos.len_of(Axis(0)) as f32;
-    let repel_weight: f32 = 0.0 / pos.len_of(Axis(0)) as f32;
+    const CTR_WEIGHT: f32 = 0.5;
+    let spread_weight: f32 = 1.0 / pos.len_of(Axis(0)) as f32;
+    let repel_weight: f32 = 0.1 / pos.len_of(Axis(0)) as f32;
 
     for Edge { src, dst } in edges {
         let mut v = edges_by_node.entry(*src).or_insert_with(Vec::new);
@@ -101,7 +101,7 @@ pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge], n_iters: usize) {
                 if row == other {
                     continue;
                 }
-                repel = repel + repel_weight * (&row - &other) * dist(&row, &other);
+                repel = repel + repel_weight * (&row - &other);
             }
             println!("{} row:{} repel:{:?}", iter_no, i, repel);
             let ctr = (&row * &row).sum().sqrt() * (-1.0 * &row) * CTR_WEIGHT;

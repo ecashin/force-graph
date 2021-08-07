@@ -130,6 +130,7 @@ impl Component for Model {
                         <label for="n_vertices">{ "Number of vertices" }</label>
                         <input type="text"
                             id="n_vertices"
+                            value="6"
                             required=true
                             oninput=self.link.callback(|e: InputData| Msg::SetNVertices(e))
                         />
@@ -138,6 +139,7 @@ impl Component for Model {
                         <label for="n_dimensions">{ "Number of dimensions" }</label>
                         <input type="text"
                             id="n_dimension"
+                            value="3"
                             required=true
                             oninput=self.link.callback(|e: InputData| Msg::SetNDimensions(e))
                         />
@@ -146,6 +148,7 @@ impl Component for Model {
                         <label for="max_degree">{ "Maximum degree" }</label>
                         <input type="text"
                             id="max_degree"
+                            value="3"
                             required=true
                             oninput=self.link.callback(|e: InputData| Msg::SetMaxDegree(e))
                         />
@@ -154,6 +157,7 @@ impl Component for Model {
                         <label for="n_iters">{ "Number of Iterations" }</label>
                         <input type="text"
                             id="n_iters"
+                            value="1"
                             required=true
                             oninput=self.link.callback(|e: InputData| Msg::SetNIters(e))
                         />
