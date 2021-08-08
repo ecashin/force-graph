@@ -10,6 +10,12 @@ The well known force-directed graph algorithm used here
 is known to work well for up to a hundred or so nodes.
 Other more complex algorithms scale to larger graphs.
 
+You could get a constant-time speedup
+by avoiding the luxurious number of `ndarray` allocations
+used in this code,
+favoring instead re-use of arrays
+and in-place operations.
+
 ## Example Web UI
 
 An example showing the layout working
