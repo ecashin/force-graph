@@ -179,14 +179,5 @@ impl Component for Model {
 }
 
 fn main() {
-    /*
-    let mut pos = crate::glayout::initial_positions(n, d);
-    let edges = crate::glayout::add_edges(n, m);
-    crate::glayout::force_graph(&mut pos, &edges);
-
-    eprintln!("n:{} m:{} d:{}", n, m, d);
-
-    crate::glayout::print_js(pos, edges);
-    */
     yew::start_app::<Model>()
 }

@@ -53,15 +53,6 @@ extern "C" {
     pub fn sync_data(this: &Graph);
 }
 
-/*
-fn add_remove_nodes(graph: &Graph) {
-    let nodes = graph.nodes();
-    // let edges = graph.edges();
-    graph.purge_nodes();
-    graph.add_nodes(nodes);
-}
-*/
-
 pub fn graph_update_positions(graph: &Graph, pos: &Array2<f32>) {
     for i in 0..pos.len_of(Axis(0)) {
         let js_row = Array::new();
@@ -73,7 +64,6 @@ pub fn graph_update_positions(graph: &Graph, pos: &Array2<f32>) {
         node.set_pos(js_row);
     }
     // adds new canvas: graph.render_in_element("graph");
-    // add_remove_nodes(graph);
     graph.sync_data();
 }
 
