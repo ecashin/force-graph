@@ -9,6 +9,7 @@ enum Msg {
     SetNDimensions(InputData),
     SetMaxDegree(InputData),
     SetNIters(InputData),
+    SetCtrWeight(InputData),
     NewGraph,
     LayoutIter,
 }
@@ -20,6 +21,7 @@ struct Model {
     n_dimensions: usize,
     max_degree: usize,
     n_iters: usize,
+    ctr_weight: f32,
     graph: Option<js::Graph>,
     positions: Option<Array2<f32>>,
     edges: Option<Vec<glayout::Edge>>,
@@ -33,10 +35,11 @@ impl Component for Model {
         Self {
             debug: "(unset)".to_owned(),
             link,
-            n_vertices: 9,
+            n_vertices: 11,
             n_dimensions: 3,
             max_degree: 3,
             n_iters: 1,
+            ctr_weight: 0.01,
             graph: None,
             positions: None,
             edges: None,
@@ -73,6 +76,13 @@ impl Component for Model {
                 }
                 true
             }
+            Msg::SetCtrWeight(input) => {
+                let n = input.value.parse::<f32>();
+                if let Ok(n) = n {
+                    self.ctr_weight = n;
+                }
+                true
+            }
             Msg::NewGraph => {
                 self.debug = format!(
                     "{} {} {} {}",
@@ -102,6 +112,7 @@ impl Component for Model {
                         self.positions.as_mut().unwrap(),
                         self.edges.as_ref().unwrap(),
                         self.n_iters,
+                        self.ctr_weight,
                     );
                     text += format!("=>{:?}", row1!(self.positions)).as_str();
                     self.debug = text;
@@ -130,7 +141,6 @@ impl Component for Model {
                         <label for="n_vertices">{ "Number of vertices" }</label>
                         <input type="text"
                             id="n_vertices"
-                            value="6"
                             required=true
                             oninput=self.link.callback(|e: InputData| Msg::SetNVertices(e))
                         />
@@ -139,7 +149,6 @@ impl Component for Model {
                         <label for="n_dimensions">{ "Number of dimensions" }</label>
                         <input type="text"
                             id="n_dimension"
-                            value="3"
                             required=true
                             oninput=self.link.callback(|e: InputData| Msg::SetNDimensions(e))
                         />
@@ -148,7 +157,6 @@ impl Component for Model {
                         <label for="max_degree">{ "Maximum degree" }</label>
                         <input type="text"
                             id="max_degree"
-                            value="3"
                             required=true
                             oninput=self.link.callback(|e: InputData| Msg::SetMaxDegree(e))
                         />
@@ -157,9 +165,17 @@ impl Component for Model {
                         <label for="n_iters">{ "Number of Iterations" }</label>
                         <input type="text"
                             id="n_iters"
-                            value="1"
                             required=true
                             oninput=self.link.callback(|e: InputData| Msg::SetNIters(e))
+                        />
+                    </div>
+                    <div>
+                        <label for="n_iters">{ "Center Pull" }</label>
+                        <input type="text"
+                            id="ctr_weight"
+                            required=true
+                            placeholder=format!("{}", self.ctr_weight)
+                            oninput=self.link.callback(|e: InputData| Msg::SetCtrWeight(e))
                         />
                     </div>
                 </div>

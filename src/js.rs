@@ -91,6 +91,15 @@ pub fn make_graph(pos: &Array2<f32>, edges: &Vec<crate::glayout::Edge>) -> Resul
         node.add_node_to_graph(&graph);
         i += 1;
     }
+    {
+        let point: Array = vec![0.0, 0.0, 0.0].into_iter().map(JsValue::from).collect();
+        let node_properties = JsValue::from_serde(&NodeProperties {
+            id: i,
+            color: "red".to_owned(),
+        })
+        .with_context(|| "creating node properties for origin")?;
+        new_node(point, node_properties).add_node_to_graph(&graph);
+    }
     console_log(JsValue::from(&graph));
     for edge in edges {
         let nodes = Array::new();
