@@ -82,7 +82,6 @@ fn dist(x1: &ArrayView1<f32>, x2: &ArrayView1<f32>) -> f32 {
 pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge], n_iters: usize, ctr_weight: f32) {
     let ideal_dist: f32 = 1.0; // c_2 in rtamassi
     let mut edges_by_node: HashMap<u32, Vec<u32>> = HashMap::new();
-    // let ctr_weight: f32 = 0.001; // 1.0 / pos.len_of(Axis(0)) as f32;
     let spread_weight: f32 = 1.0; // C_1 == 2 in rtamassi
     let repel_weight: f32 = 0.01; // C_3 in rtamassi
     const SIG_DISTANCE: f32 = 0.00001;
@@ -106,7 +105,6 @@ pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge], n_iters: usize, ctr_we
                 let distance = dist(&row, &other);
                 repel = repel + (repel_weight / distance.powi(2)) * (&row - &other);
             }
-            println!("{} row:{} repel:{:?}", iter_no, i, repel);
             let distance = (&row * &row).sum().sqrt();
             let ctr = if distance > SIG_DISTANCE {
                 let direction = &row / distance;
@@ -114,10 +112,8 @@ pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge], n_iters: usize, ctr_we
             } else {
                 &row * 0.0
             };
-            println!("{} row:{} ctr:{:?}", iter_no, i, ctr);
             let mut spread: Array1<f32> = Array1::zeros(row.len());
             for (point, neighbors) in &edges_by_node {
-                let point_i = *point; // XXXdebug
                 let point = &pos.index_axis(Axis(0), *point as usize);
                 for j in neighbors {
                     if *j == i as u32 {
@@ -126,17 +122,6 @@ pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge], n_iters: usize, ctr_we
                     let neighbor = &pos.index_axis(Axis(0), *j as usize);
                     let obs_dist = dist(&point, &neighbor);
                     let direction = (neighbor - point) / obs_dist;
-                    crate::js::console_log(wasm_bindgen::JsValue::from(format!(
-                        "point:{}:{:?} nbr:{}:{:?}",
-                        point_i, point, *j, neighbor
-                    )));
-                    crate::js::console_log(wasm_bindgen::JsValue::from(format!(
-                        "ideal_dist:{} obs_dist:{} force:{} direction:{:?}",
-                        ideal_dist,
-                        obs_dist,
-                        (obs_dist / ideal_dist).log(10.0),
-                        direction
-                    )));
                     let n_others = neighbors.len() as f32;
                     spread = spread
                         + (spread_weight / n_others)
@@ -144,17 +129,8 @@ pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge], n_iters: usize, ctr_we
                             * direction;
                 }
             }
-            crate::js::console_log(wasm_bindgen::JsValue::from(format!("before:row:{:?}", row)));
-            crate::js::console_log(wasm_bindgen::JsValue::from(format!(
-                "{} row:{} spread:{:?}",
-                iter_no, i, spread
-            )));
             let mut new_row = new_positions.index_axis_mut(Axis(0), i);
             new_row += &(repel + ctr + spread);
-            crate::js::console_log(wasm_bindgen::JsValue::from(format!(
-                "{} row:{} new_row:{:?}",
-                iter_no, i, new_row
-            )));
         }
         pos.assign(&new_positions);
     }
