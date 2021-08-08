@@ -16,9 +16,22 @@ used in this code,
 favoring instead re-use of arrays
 and in-place operations.
 
+## Todo: Librarification
+
+The [glayout.rs](src/glayout.rs) sources contain the platform-independent
+graph layout code, but this repo isn't set up to build a proper library right now.
+
 ## Example Web UI
 
 An example showing the layout working
 can be run via `trunk serve`
 after installing
 [trunk](https://trunkrs.dev/).
+
+(This repo is also an exercise in Web Assembly and JavaScript interation.)
+
+The most simple workflow is to hit the "New Graph" button
+and then hit the iterate button to see the algorithm changing the layout.
+
+You can pan the viewpoint and zoom using a scrollwheel or two fingers on a trackpad,
+as usual for [graphosaurus](https://github.com/frewsxcv/graphosaurus).
