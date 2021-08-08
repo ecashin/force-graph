@@ -52,26 +52,6 @@ pub fn add_edges(n_vertices: usize, max_degree: usize) -> Vec<Edge> {
         .collect()
 }
 
-pub fn _print_js(pos: Array2<f32>, edges: Vec<Edge>) {
-    println!("(function () {{");
-    println!("    var g = G.graph()");
-    println!("    var nodes = []");
-    println!("    var edge, node");
-    for row in pos.rows() {
-        println!("    node = G.node({}, {{\"color\": \"black\"}})", row);
-        println!("    nodes.push(node); node.addTo(g)");
-    }
-    for Edge { src, dst } in edges.into_iter() {
-        println!(
-            "    edge = G.edge([nodes[{}], nodes[{}]], {{color: \"blue\"}})",
-            src, dst
-        );
-        println!("    edge.addTo(g)");
-    }
-    println!("    g.renderIn(\"graph\")");
-    println!("}})()\n");
-}
-
 fn dist(x1: &ArrayView1<f32>, x2: &ArrayView1<f32>) -> f32 {
     let diff = x1 - x2;
 
