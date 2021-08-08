@@ -59,8 +59,9 @@ fn dist(x1: &ArrayView1<f32>, x2: &ArrayView1<f32>) -> f32 {
 }
 
 // https://cs.brown.edu/people/rtamassi/gdhandbook/chapters/force-directed.pdf
-pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge], n_iters: usize, ctr_weight: f32) {
-    let ideal_dist: f32 = 1.0; // c_2 in rtamassi
+pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge], n_iters: usize) {
+    const IDEAL_DISTANCE: f32 = 1.0; // c_2 in rtamassi
+    let ctr_weight = IDEAL_DISTANCE / 1000.0;
     let mut edges_by_node: HashMap<u32, Vec<u32>> = HashMap::new();
     let spread_weight: f32 = 1.0; // C_1 == 2 in rtamassi
     let repel_weight: f32 = 0.01; // C_3 in rtamassi
@@ -105,7 +106,7 @@ pub fn force_graph(pos: &mut Array2<f32>, edges: &[Edge], n_iters: usize, ctr_we
                     let n_others = neighbors.len() as f32;
                     spread = spread
                         + (spread_weight / n_others)
-                            * (obs_dist / ideal_dist).log(10.0)
+                            * (obs_dist / IDEAL_DISTANCE).log(10.0)
                             * direction;
                 }
             }
