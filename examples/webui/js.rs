@@ -67,7 +67,7 @@ pub fn graph_update_positions(graph: &Graph, pos: &Array2<f32>) {
     graph.sync_data();
 }
 
-pub fn make_graph(pos: &Array2<f32>, edges: &Vec<crate::glayout::Edge>) -> Result<Graph> {
+pub fn make_graph(pos: &Array2<f32>, edges: &Vec<forcegraph::Edge>) -> Result<Graph> {
     let graph = new_graph();
     let mut i = 0;
     for row in pos.rows() {

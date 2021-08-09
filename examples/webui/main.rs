@@ -1,7 +1,6 @@
 use ndarray::{Array2, Axis};
 use yew::{html, Component, ComponentLink, Html, InputData, ShouldRender};
 
-mod glayout;
 mod js;
 
 enum Msg {
@@ -22,7 +21,7 @@ struct Model {
     n_iters: usize,
     graph: Option<js::Graph>,
     positions: Option<Array2<f32>>,
-    edges: Option<Vec<glayout::Edge>>,
+    edges: Option<Vec<forcegraph::Edge>>,
 }
 
 impl Component for Model {
@@ -79,8 +78,8 @@ impl Component for Model {
                     self.n_vertices, self.n_dimensions, self.max_degree, self.n_iters
                 )
                 .to_owned();
-                let pos = crate::glayout::initial_positions(self.n_vertices, self.n_dimensions);
-                let edges = crate::glayout::add_edges(self.n_vertices, self.max_degree);
+                let pos = forcegraph::initial_positions(self.n_vertices, self.n_dimensions);
+                let edges = forcegraph::add_edges(self.n_vertices, self.max_degree);
                 self.graph = Some(js::make_graph(&pos, &edges).expect("making graph"));
                 self.positions = Some(pos);
                 self.edges = Some(edges);
@@ -98,14 +97,14 @@ impl Component for Model {
                         // self.positions.as_ref().unwrap().index_axis(Axis(0), 0)
                         row1!(self.positions)
                     );
-                    crate::glayout::force_graph(
+                    forcegraph::force_graph(
                         self.positions.as_mut().unwrap(),
                         self.edges.as_ref().unwrap(),
                         self.n_iters,
                     );
                     text += format!("=>{:?}", row1!(self.positions)).as_str();
                     self.debug = text;
-                    crate::js::graph_update_positions(
+                    js::graph_update_positions(
                         self.graph.as_ref().unwrap(),
                         self.positions.as_ref().unwrap(),
                     )
