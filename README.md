@@ -16,6 +16,14 @@ used in this code,
 favoring instead re-use of arrays
 and in-place operations.
 
+## Dependencies
+
+A Rust development environment is required,
+e.g., as installed by [rustup](https://rustup.rs/).
+
+The [cargo-make](https://docs.rs/crate/cargo-make/0.8.0) tool
+is used to run the example web application.
+
 ## Todo: Librarification
 
 The [glayout.rs](src/glayout.rs) sources contain the platform-independent

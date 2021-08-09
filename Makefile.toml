@@ -1,0 +1,5 @@
+[tasks.example]
+script = [
+    "cd examples/webui",
+    "trunk serve"
+]
