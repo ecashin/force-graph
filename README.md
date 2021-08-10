@@ -22,7 +22,8 @@ A Rust development environment is required,
 e.g., as installed by [rustup](https://rustup.rs/).
 
 The [cargo-make](https://docs.rs/crate/cargo-make/0.8.0) tool
-is used to run the example web application.
+is used to coordinate the example web application,
+and the [trunk](https://trunkrs.dev/) tool is used by `cargo-make`.
 
 ## Todo: Librarification
 
@@ -32,14 +33,15 @@ graph layout code, but this repo isn't set up to build a proper library right no
 ## Example Web UI
 
 An example showing the layout working
-can be run via `trunk serve`
-after installing
-[trunk](https://trunkrs.dev/).
+can be run via `cargo make example`
+after installing the dependencies listed above.
 
-(This repo is also an exercise in Web Assembly and JavaScript interation.)
+(This repo is also an exercise in Web Assembly and JavaScript integration.)
 
 The most simple workflow is to hit the "New Graph" button
 and then hit the iterate button to see the algorithm changing the layout.
 
+You will probably need to zoom out.
 You can pan the viewpoint and zoom using a scrollwheel or two fingers on a trackpad,
-as usual for [graphosaurus](https://github.com/frewsxcv/graphosaurus).
+as usual for [graphosaurus](https://github.com/frewsxcv/graphosaurus)
+WebGL 3D graph displays.
